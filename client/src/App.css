@@ -36,3 +36,8 @@ a{
   height:max-content;
   margin:20px auto;
 }
+#toast-container{
+  top:30px;
+  right:20px;
+  left:auto !important;
+}

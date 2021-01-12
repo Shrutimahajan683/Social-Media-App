@@ -2,6 +2,8 @@ const express=require('express')
 const app=express()
 const PORT=5000
 const mongoose=require('mongoose')
+const cors = require('cors')
+app.use(cors())
 const {MONGOURI}=require('./Keys')
 //const requirelogin=require('./middleware/require_login')
 
@@ -23,6 +25,7 @@ require('./models/post')
 app.use(express.json())
 app.use(require('./routes/auth'))
 app.use(require('./routes/posts'))
+app.use(require('./routes/user'))
 
 
 

@@ -1,22 +1,28 @@
 
 import React,{useEffect,useState,useContext} from 'react'
 import {UserContext} from '../../App'
+import {useParams} from 'react-router-dom'
 
 const Profile = ()=>{
-    const [mypics,setPics]=useState([])
+    const [userProfile,setProfile]=useState(null)
     const {state,dispatch}=useContext(UserContext)
+    const {userid}=useParams()
+    console.log(userid)
     useEffect(()=>{
-       fetch('/mypost',{
+       fetch(`/user/${userid}`,{
            headers:{
                "Authorization":"Bearer "+localStorage.getItem("jwt")
            }
        }).then(res=>res.json())
        .then(result=>{
-          setPics(result.mypost)
+        console.log(result)
+        setProfile(result)
        })
     },[])
     return(
-        <div style={{maxWidth:"550px",margin:"0px auto"}}>
+        <>
+        {userProfile?
+            <div style={{maxWidth:"550px",margin:"0px auto"}}>
             <div style={{display:"flex",
             justifyContent:"space-around",
             margin:"18px 0px",
@@ -27,10 +33,11 @@ const Profile = ()=>{
                  />
                 </div>
                 <div>
-                 <h4>{state?state.name:"loading"}</h4>
+                 <h4>{userProfile.user.name}</h4>
+                 <h5>{userProfile.user.email}</h5>
                  <div style={{display:"flex",justifyContent:"space-between",width:"108%"}}> 
                  <h6>
-                     40 posts
+                     {userProfile.posts.length} posts
                  </h6>
                  <h6>
                      40 followers
@@ -44,7 +51,7 @@ const Profile = ()=>{
             </div>
             <div className="gallery">
                 {
-                    mypics.map(item=>{
+                    userProfile.posts.map(item=>{
                         return(
                             <img key={item._id} className="item" src={item.photo} alt={item.title}/>
                         )
@@ -52,6 +59,8 @@ const Profile = ()=>{
                 }
             </div>
         </div>
+        :<h2>loading...!</h2>}
+        </>
     )
 }
   
