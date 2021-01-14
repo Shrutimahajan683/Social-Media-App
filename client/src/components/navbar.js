@@ -9,6 +9,7 @@ const renderList=()=>{
   if(state){
     return [
         <li><Link to="/profile">Profile</Link></li>,
+        <li><Link to="/myfollowingposts">My Following Posts</Link></li>,
         <li><Link to="/create">Createpost</Link></li>,
         <li>
             <button className="btn waves-effect waves-light" 

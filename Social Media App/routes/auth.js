@@ -9,7 +9,7 @@ const requirelogin=require('../middleware/require_login')
 
 
 router.post('/signup',(req,res)=>{
-    const {name,email,password}=req.body
+    const {name,email,password,pic}=req.body
     if(!name||!email||!password)
     {
         res.status(422).json({error:"please add fields"})
@@ -25,7 +25,8 @@ router.post('/signup',(req,res)=>{
             const User=new user({
                 email,
                 password:hashedpassword,
-                name
+                name,
+                pic
             })
             User.save()
             .then(User=>{
@@ -57,8 +58,8 @@ router.post('/signin',(req,res)=>{
             if(domatch){
                 //res.json({meassage:"successfully signed in"})
                 const token=jwt.sign({_id:saveduser._id},JWT_SECRET)
-                const {_id,name,email}=saveduser
-                res.json({token,user:{_id,name,email}})
+                const {_id,name,email,followers,following,pic}=saveduser
+                res.json({token,user:{_id,name,email,followers,following,pic}})
             }
             else{
                 res.status(422).json({error:"invalid email or password"})

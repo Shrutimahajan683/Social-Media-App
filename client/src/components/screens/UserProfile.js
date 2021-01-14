@@ -7,6 +7,7 @@ const Profile = ()=>{
     const [userProfile,setProfile]=useState(null)
     const {state,dispatch}=useContext(UserContext)
     const {userid}=useParams()
+    const [showFollow,setshowFollow]=useState(state?!state.following.includes(userid):true)
     console.log(userid)
     useEffect(()=>{
        fetch(`/user/${userid}`,{
@@ -19,6 +20,63 @@ const Profile = ()=>{
         setProfile(result)
        })
     },[])
+
+    const followUser = ()=>{
+        fetch('/follow',{
+            method:"put",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer "+localStorage.getItem('jwt')
+            },
+            body:JSON.stringify({
+                followId:userid
+            })
+        }).then(res=>res.json())
+        .then(data=>{
+          console.log(data)
+          dispatch({type:"UPDATE",payload:{following:data.following,followers:data.followers}})
+          localStorage.setItem("user",JSON.stringify(data))
+          setProfile((prevState)=>{
+              return {
+             ...prevState,
+             user:{
+                 ...prevState.user,
+                 followers:[...prevState.user.followers,data._id]
+             }
+              }
+          })
+          setshowFollow(false)
+        })
+    }
+
+    const unfollowUser = ()=>{
+        fetch('/unfollow',{
+            method:"put",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer "+localStorage.getItem('jwt')
+            },
+            body:JSON.stringify({
+                unfollowId:userid
+            })
+        }).then(res=>res.json())
+        .then(data=>{
+          console.log(data)
+          dispatch({type:"UPDATE",payload:{following:data.following,followers:data.followers}})
+          localStorage.setItem("user",JSON.stringify(data))
+          setProfile((prevState)=>{
+              const newFollwer=prevState.user.followers.filter(item=>item!=data._id)
+              return {
+             ...prevState,
+             user:{
+                 ...prevState.user,
+                 followers:newFollwer
+             }
+              }
+          })
+          setshowFollow(true)
+        })
+    }
     return(
         <>
         {userProfile?
@@ -29,7 +87,7 @@ const Profile = ()=>{
             borderBottom:"1px solid grey"
         }}>
                 <div>
-                  <img style={{width:"160px",height:"160px",borderRadius:"80px"}} src="https://images.unsplash.com/photo-1585925130019-eeafcd31b7f3?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTJ8fHBlcnNvbnxlbnwwfDJ8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+                  <img style={{width:"160px",height:"160px",borderRadius:"80px"}} src={userProfile.user.pic}
                  />
                 </div>
                 <div>
@@ -40,12 +98,24 @@ const Profile = ()=>{
                      {userProfile.posts.length} posts
                  </h6>
                  <h6>
-                     40 followers
+                     {userProfile.user.following.length} following
                  </h6>
                  <h6>
-                     40 followers
+                     {userProfile.user.followers.length} followers
                  </h6>
                  </div>
+                 {showFollow?
+                 <button className="btn waves-effect waves-light" 
+                 onClick={()=>followUser()}
+                   >
+               Follow
+              </button>
+              :<button className="btn waves-effect waves-light" 
+              onClick={()=>unfollowUser()}
+                >
+            Unfollow
+           </button>
+                 }
                  
                 </div>
             </div>
